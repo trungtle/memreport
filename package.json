@@ -2,7 +2,7 @@
   "name": "memreport",
   "private": false,
   "version": "0.0.0",
-  "homepage": "https://trungtle.github.io/memreport",
+  "homepage": "http://trungtle.github.io/memreport",
   "type": "module",
   "scripts": {
     "dev": "vite",
