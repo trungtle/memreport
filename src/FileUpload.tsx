@@ -1,12 +1,11 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useRef } from 'react';
 
-function FileUpload({ setLinesArray }: { setLinesArray: (lines: string[]) => void }) {
-  const [file, setFile] = useState<File>();
-
+function FileUpload({ setLinesArray, setFileName }: { setLinesArray: (lines: string[]) => void; setFileName: (name: string) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFile(e.target.files[0]);
       if (e.target.files[0]) {
+        setFileName(e.target.files[0].name);
         readFileInChunks(e.target.files[0]);
       }
     }
@@ -36,15 +35,21 @@ function FileUpload({ setLinesArray }: { setLinesArray: (lines: string[]) => voi
     readNextChunk();
   } 
 
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div>
-      <input 
-        type="file" 
+      <button onClick={handleButtonClick}>Upload File</button>
+      <input
+        type="file"
         name=".memreport"
         accept=".txt, .memreport"
-        onChange={handleFileChange} />
-
-      <div>{file && `${file.name}`}</div>
+        onChange={handleFileChange}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
     </div>
   );
 }

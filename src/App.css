@@ -1,19 +1,45 @@
+@font-face {
+  font-family: 'Monolisa';
+  src: url('./assets/fonts/MonoLisa/MonoLisa-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Monolisa';
+  src: url('./assets/fonts/MonoLisa/MonoLisa-RegularItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Monolisa';
+  src: url('./assets/fonts/MonoLisa/MonoLisa-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Monolisa';
+  src: url('./assets/fonts/MonoLisa/MonoLisa-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
 html, body, #root {
+  width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
 #root {
-  width: 100%;
+  text-align: left;
   display: flex;
+  margin: 0;
   flex-direction: column;
-}
-
-#root {
-  max-width: 2040px;
-  margin: 0 auto;
-  text-align: center;
+  font-family: 'Monolisa', 'Courier New', Courier, monospace;
+  font-size: .7em;
 }
 
 .memreport-container {
@@ -22,12 +48,58 @@ html, body, #root {
   height: 100%;
 }
 
-.datagrid-container {
-  flex: 1;
+.menu-container {
+  justify-content: flex-start;
+  flex-direction: row;
+  display: flex;
+}
+
+.file-name {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+
+.memreport-menu {
+  padding: 0;
+  margin:0;
   display: flex;
   flex-direction: column;
 }
 
+.menu-item {
+  flex-grow: 1;
+  display: flex;
+}
+
+.memreport-table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+}
+
+.datagrid-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+}
+
 .react-data-grid {
   flex: 1;
+}
+
+.texture-group-table {
+  font-size: 1em;
+  text-align: left;
+}
+
+.texture-table {
+  block-size: 100%;
+  font-size: 1em;
+  text-align: left;
 }
