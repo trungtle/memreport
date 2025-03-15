@@ -12,7 +12,7 @@ function FileUpload({ setLinesArray, setFileName }: { setLinesArray: (lines: str
   };
 
   const readFileInChunks = async (f: File) => {
-    const CHUNK_SIZE = 1024 * 1024; // 1MB chunk size
+    const CHUNK_SIZE = 2048 * 1024 * 2; // 4MB chunk size
     const fileReader = new FileReader();
     let offset = 0;
     let newLinesArray : string[] = [];

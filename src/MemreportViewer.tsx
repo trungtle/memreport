@@ -96,31 +96,32 @@ const Memreport: React.FC = () => {
         let capturing = false;
         let skipCount = 0;
         const filteredLines = lines.filter(line => {
-          if (line.trim() === '') return false;
-          if (line.toLowerCase().startsWith(beginMarker.toLowerCase())) {
-            capturing = true;
-            skipCount = 0;
-            return false;
-          }
-          if (line.toLowerCase().startsWith(endMarker.toLowerCase())) {
-            capturing = false;
-            return false;
-          }
-          if (capturing) {
-            if (skipCount < 2) {
-              skipCount++;
-              return false;
+            if (!line) return false;            
+            if (line.trim() === '') return false;
+            if (line.toLowerCase().startsWith(beginMarker.toLowerCase())) {
+                capturing = true;
+                skipCount = 0;
+                return false;
             }
-            return true;
-          }          
-          return false;
+            if (line.toLowerCase().startsWith(endMarker.toLowerCase())) {
+                capturing = false;
+                return false;
+            }
+            if (capturing) {
+                if (skipCount < 2) {
+                    skipCount++;
+                    return false;
+                }
+                return true;
+            }          
+            return false;
         });
 
         // Test on lines that provide total texture counts and sizes
-        const testCondition = (line: string) => line.startsWith('Total') && (line.split(',').length < NUM_LISTTEXTURES_COLUMNS);
+        const checkIfTotalLinesCondition = (line: string) => line.startsWith('Total') && (line.split(',').length < NUM_LISTTEXTURES_COLUMNS);
 
         const [totalLines, textureLines] = filteredLines.reduce<[string[], string[]]>(([total, texture], line) => {
-            if (testCondition(line)) {
+            if (checkIfTotalLinesCondition(line)) {
                 total.push(line);
             } else {
                 texture.push(line);
@@ -310,11 +311,11 @@ const Memreport: React.FC = () => {
             currentSize: currentSize,
             format: tokens[3].split('_').pop() || '',
             lodGroup: tokens[4].split('_').pop() || '',
-            streaming: tokens[6].trim() === 'YES' ? true : false,
-            vt: tokens[8].trim() === 'YES' ? true : false,
+            streaming: tokens[6] ? tokens[6].trim() === 'YES' ? true : false : false,
+            vt: tokens[8] ? tokens[8].trim() === 'YES' ? true : false : false,
             usageCount: parseInt(tokens[9], 10),
             numMips: parseInt(tokens[10], 10),
-            uncompressed: tokens[11].trim() === 'YES' ? true : false
+            uncompressed: tokens[11] ? tokens[11].trim() === 'YES' ? true : false : false
         };
     });
 
