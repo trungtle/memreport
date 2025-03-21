@@ -8,16 +8,43 @@ import '@szhsin/react-menu/dist/transitions/zoom.css';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import TextureTab from './tabs/TextureTab';
+import FromMemreportTab from './tabs/FromMemreportTab';
 
 const Memreport: React.FC = () => {
     const [fileName, setFileName] = useState<string>('');
-    const [linesArray, setLinesArray] = useState<string[]>([]);
-    const [totalLinesArray, setTotalLinesArray] = useState<string[]>([]);
-    const NUM_LISTTEXTURES_COLUMNS = 12;
+    const [fromMemreportLinesArray, setFromMemreportLinesArray] = useState<string[]>([]);
+    const [textureLinesArray, setTextureLinesArray] = useState<string[]>([]);
+    const [textureGroupLinesArray, setTextureGroupLinesArray] = useState<string[]>([]);
 
-    const handleSetLinesArray = (lines: string[]) => {
+    const parseFromMemreport = (lines: string[]) => {
+        const beginMarker = 'MemReport: Begin command "Mem FromReport"';
+        const endMarker = 'MemReport: End command "Mem FromReport"';
+        
+        let capturing = false;
+        let filteredLines = lines.filter(line => {
+            if (!line) return false;            
+            if (line.trim() === '') return false;
+            if (line.toLowerCase().startsWith(beginMarker.toLowerCase())) {
+                capturing = true;
+                return false;
+            }
+            if (line.toLowerCase().startsWith(endMarker.toLowerCase())) {
+                capturing = false;
+                return false;
+            }
+            if (capturing) {
+                return true;
+            }          
+            return false;
+        });
+
+        setFromMemreportLinesArray(filteredLines);
+    }
+
+    const parseTextureLines = (lines: string[]) => {
         const beginMarker = 'MemReport: Begin command "ListTextures';
         const endMarker = 'MemReport: End command "ListTextures';
+        
         let capturing = false;
         let skipCount = 0;
         const filteredLines = lines.filter(line => {
@@ -43,10 +70,11 @@ const Memreport: React.FC = () => {
         });
 
         // Test on lines that provide total texture counts and sizes
-        const checkIfTotalLinesCondition = (line: string) => line.startsWith('Total') && (line.split(',').length < NUM_LISTTEXTURES_COLUMNS);
+        const NUM_LISTTEXTURES_COLUMNS = 12;
+        const checkTextureGroupLinesCondition = (line: string) => line.startsWith('Total') && (line.split(',').length < NUM_LISTTEXTURES_COLUMNS);
 
-        const [totalLines, textureLines] = filteredLines.reduce<[string[], string[]]>(([total, texture], line) => {
-            if (checkIfTotalLinesCondition(line)) {
+        const [textureGroupLines, textureLines] = filteredLines.reduce<[string[], string[]]>(([total, texture], line) => {
+            if (checkTextureGroupLinesCondition(line)) {
                 total.push(line);
             } else {
                 texture.push(line);
@@ -54,8 +82,15 @@ const Memreport: React.FC = () => {
             return [total, texture];
         }, [[], []]);
 
-        setTotalLinesArray(totalLines);
-        setLinesArray(textureLines);
+        const uniqueTextureLines = Array.from(new Set(textureLines));
+
+        setTextureGroupLinesArray(textureGroupLines);
+        setTextureLinesArray(uniqueTextureLines);
+    }
+
+    const handleSetLinesArray = (lines: string[]) => {
+        parseFromMemreport(lines);
+        parseTextureLines(lines);
     }
 
 
@@ -77,20 +112,18 @@ const Memreport: React.FC = () => {
         </div>
 
         <div className="memreport-table">
-
             <Tabs>
                 <TabList>
-                    <Tab>Textures</Tab>
-                    <Tab>Particle Systems</Tab>
+                <Tab>Summary</Tab>
+                <Tab>Textures</Tab>
                 </TabList>
 
                 <TabPanel>
-                    <TextureTab textureGroupLines={totalLinesArray} textureLines={linesArray} />
-
+                    <FromMemreportTab fromMemreportLines={fromMemreportLinesArray} />
                 </TabPanel>
 
                 <TabPanel>
-                    ParticleSystems
+                    <TextureTab textureGroupLines={textureGroupLinesArray} textureLines={textureLinesArray} />
                 </TabPanel>
 
             </Tabs>

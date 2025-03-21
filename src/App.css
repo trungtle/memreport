@@ -103,3 +103,9 @@ html, body, #root {
   font-size: 1em;
   text-align: left;
 }
+
+.summary-table {
+  font-size: 1em;
+  text-align: left;
+  block-size: 100%;
+}
