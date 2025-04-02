@@ -16,7 +16,6 @@ interface SummaryRow {
 
 interface Row {
     name: string;
-    value: string;
 }
 
 interface FromMemreportTabProps {
@@ -58,18 +57,13 @@ const FromMemreportTab: React.FC<FromMemreportTabProps> = ({fromMemreportLines})
                 return `Platform: ${row.platform}, Physical Memory: ${row.physicalMemory}, Virtual Memory: ${row.virtualMemory}`;
             },
         },
-        { key: 'value', name: '',
-        },
         ]}, []);
     
 
     const rows : readonly Row[] = fromMemreportLines.map((line) => {        
 
-        //let tokens = line.split(':');
-
         return { 
-            name: "",
-            value: line
+            name: line,
         };
     });
 
