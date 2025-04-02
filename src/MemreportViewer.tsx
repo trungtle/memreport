@@ -16,6 +16,8 @@ const Memreport: React.FC = () => {
     const [fromMemreportLinesArray, setFromMemreportLinesArray] = useState<string[]>([]);
     const [staticMeshLinesArray, setStaticMeshLinesArray] = useState<string[]>([]);
     const [staticMeshTotalLine, setStaticMeshTotalLine] = useState<string>("");
+    const [skeletalMeshLinesArray, setSkeletalMeshLinesArray] = useState<string[]>([]);
+    const [skeletalMeshTotalLine, setSkeletalMeshTotalLine] = useState<string>("");
     const [textureLinesArray, setTextureLinesArray] = useState<string[]>([]);
     const [textureGroupLinesArray, setTextureGroupLinesArray] = useState<string[]>([]);
 
@@ -67,7 +69,6 @@ const Memreport: React.FC = () => {
             if (capturing) {
                 if (skipCount < 3) {
                     skipCount++;
-                    console.log(line);
                     return false;
                 }
                 return true;
@@ -79,13 +80,54 @@ const Memreport: React.FC = () => {
 
         const NUM_OBJLIST_COLUMNS = 8;
         filteredLines = filteredLines.filter(line => {
-            if (line.split(/\s+/).length != NUM_OBJLIST_COLUMNS) {
+            if (line.trim().split(/\s+/).length != NUM_OBJLIST_COLUMNS) {
                 return false;
             }
             return true;
         });
 
-        setStaticMeshLinesArray(filteredLines);
+        setStaticMeshLinesArray(filteredLines.slice(0, -2));
+    }
+
+    const parseSkeletalMeshLines = (lines: string[]) => {
+        const beginMarker = 'MemReport: Begin command "obj list class=SkeletalMesh -resourcesizesort"';
+        const endMarker = 'MemReport: End command "obj list class=SkeletalMesh -resourcesizesort"';
+
+        let capturing = false;
+        let skipCount = 0;
+        let filteredLines = lines.filter(line => {
+            if (!line) return false;            
+            if (line.trim() === '') return false;
+            if (line.toLowerCase().startsWith(beginMarker.toLowerCase())) {
+                capturing = true;
+                return false;
+            }
+            if (line.toLowerCase().startsWith(endMarker.toLowerCase())) {
+                capturing = false;
+                return false;
+            }
+            if (capturing) {
+                if (skipCount < 3) {
+                    skipCount++;
+                    return false;
+                }
+                return true;
+            }          
+            return false;
+        });
+
+        setSkeletalMeshTotalLine(filteredLines[filteredLines.length - 1]);
+
+        const NUM_OBJLIST_COLUMNS = 8;
+        filteredLines = filteredLines.filter(line => {
+            if (line.trim().split(/\s+/).length != NUM_OBJLIST_COLUMNS) {
+                console.log(line.split(/\s+/));
+                return false;
+            }
+            return true;
+        });
+
+        setSkeletalMeshLinesArray(filteredLines.slice(0, -2));
     }
 
     const parseTextureLines = (lines: string[]) => {
@@ -139,6 +181,7 @@ const Memreport: React.FC = () => {
         lines = parseFromMemreport(lines);
         parseTextureLines(lines);
         parseStaticMeshLines(lines);
+        parseSkeletalMeshLines(lines);
     }
 
 
@@ -165,6 +208,7 @@ const Memreport: React.FC = () => {
                 <Tab>Summary</Tab>
                 <Tab>Textures</Tab>
                 <Tab>Static Meshes</Tab>
+                <Tab>Skeletal Meshes</Tab>
                 </TabList>
 
                 <TabPanel>
@@ -177,6 +221,10 @@ const Memreport: React.FC = () => {
 
                 <TabPanel>
                     <ObjListTab lines={staticMeshLinesArray} totalLine={staticMeshTotalLine} />
+                </TabPanel>
+
+                <TabPanel>
+                    <ObjListTab lines={skeletalMeshLinesArray} totalLine={skeletalMeshTotalLine} />
                 </TabPanel>
 
             </Tabs>

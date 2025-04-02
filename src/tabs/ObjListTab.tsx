@@ -170,7 +170,7 @@ const ObjListTab: React.FC<ObjListTabProps> = ({lines, totalLine}) => {
         // Parse this:
         // Object      NumKB      MaxKB   ResExcKB  ResExcDedSysKB  ResExcDedVidKB     ResExcUnkKB
 
-        let tokens = line.split(/\s+/);
+        let tokens = line.trim().split(/\s+/);
 
         return { 
             name: tokens[1].split('.')[0] || '',
@@ -249,6 +249,7 @@ const ObjListTab: React.FC<ObjListTabProps> = ({lines, totalLine}) => {
                 <FilterContext value={filters}>
                     <DataGrid
                         topSummaryRows={summaryRows}
+                        bottomSummaryRows={summaryRows}
                         rows={filteredRows}
                         columns={columns}
                         sortColumns={sortColumns}
