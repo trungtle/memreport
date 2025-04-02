@@ -9,18 +9,50 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import TextureTab from './tabs/TextureTab';
 import FromMemreportTab from './tabs/FromMemreportTab';
+import ObjListTab from './tabs/ObjListTab';
 
 const Memreport: React.FC = () => {
     const [fileName, setFileName] = useState<string>('');
     const [fromMemreportLinesArray, setFromMemreportLinesArray] = useState<string[]>([]);
+    const [staticMeshLinesArray, setStaticMeshLinesArray] = useState<string[]>([]);
+    const [staticMeshTotalLine, setStaticMeshTotalLine] = useState<string>("");
     const [textureLinesArray, setTextureLinesArray] = useState<string[]>([]);
     const [textureGroupLinesArray, setTextureGroupLinesArray] = useState<string[]>([]);
 
-    const parseFromMemreport = (lines: string[]) => {
+    const parseFromMemreport = (lines: string[]): string[] => {
         const beginMarker = 'MemReport: Begin command "Mem FromReport"';
         const endMarker = 'MemReport: End command "Mem FromReport"';
         
         let capturing = false;
+        let filteredLines: string[] = [];
+        const remainingLines = lines.filter(line => {
+            if (!line) return false;            
+            if (line.trim() === '') return false;
+            if (line.toLowerCase().startsWith(beginMarker.toLowerCase())) {
+                capturing = true;
+                return false;
+            }
+            if (line.toLowerCase().startsWith(endMarker.toLowerCase())) {
+                capturing = false;
+                return false;
+            }
+            if (capturing) {
+                filteredLines.push(line);
+                return false;
+            }          
+            return true;
+        });
+
+        setFromMemreportLinesArray(filteredLines);
+        return remainingLines;
+    }
+
+    const parseStaticMeshLines = (lines: string[]) => {
+        const beginMarker = 'MemReport: Begin command "obj list class=StaticMesh -resourcesizesort"';
+        const endMarker = 'MemReport: End command "obj list class=StaticMesh -resourcesizesort"';
+
+        let capturing = false;
+        let skipCount = 0;
         let filteredLines = lines.filter(line => {
             if (!line) return false;            
             if (line.trim() === '') return false;
@@ -33,12 +65,27 @@ const Memreport: React.FC = () => {
                 return false;
             }
             if (capturing) {
+                if (skipCount < 3) {
+                    skipCount++;
+                    console.log(line);
+                    return false;
+                }
                 return true;
             }          
             return false;
         });
 
-        setFromMemreportLinesArray(filteredLines);
+        setStaticMeshTotalLine(filteredLines[filteredLines.length - 1]);
+
+        const NUM_OBJLIST_COLUMNS = 8;
+        filteredLines = filteredLines.filter(line => {
+            if (line.split(/\s+/).length != NUM_OBJLIST_COLUMNS) {
+                return false;
+            }
+            return true;
+        });
+
+        setStaticMeshLinesArray(filteredLines);
     }
 
     const parseTextureLines = (lines: string[]) => {
@@ -89,8 +136,9 @@ const Memreport: React.FC = () => {
     }
 
     const handleSetLinesArray = (lines: string[]) => {
-        parseFromMemreport(lines);
+        lines = parseFromMemreport(lines);
         parseTextureLines(lines);
+        parseStaticMeshLines(lines);
     }
 
 
@@ -116,6 +164,7 @@ const Memreport: React.FC = () => {
                 <TabList>
                 <Tab>Summary</Tab>
                 <Tab>Textures</Tab>
+                <Tab>Static Meshes</Tab>
                 </TabList>
 
                 <TabPanel>
@@ -124,6 +173,10 @@ const Memreport: React.FC = () => {
 
                 <TabPanel>
                     <TextureTab textureGroupLines={textureGroupLinesArray} textureLines={textureLinesArray} />
+                </TabPanel>
+
+                <TabPanel>
+                    <ObjListTab lines={staticMeshLinesArray} totalLine={staticMeshTotalLine} />
                 </TabPanel>
 
             </Tabs>

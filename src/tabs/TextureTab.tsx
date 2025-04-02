@@ -1,9 +1,9 @@
-import  {createContext, useContext, useMemo, useState} from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
-import { Column, DataGrid, RenderHeaderCellProps, SortColumn } from 'react-data-grid';
-import 'react-data-grid/lib/styles.css';
 import "@szhsin/react-menu/dist/core.css";
 import '@szhsin/react-menu/dist/transitions/zoom.css';
+import { Column, DataGrid, RenderHeaderCellProps, SortColumn } from 'react-data-grid';
+import 'react-data-grid/lib/styles.css';
 import 'react-tabs/style/react-tabs.css';
 
 const FilterContext = createContext<Filter | undefined>(undefined);
@@ -327,9 +327,9 @@ const TextureTab: React.FC<TextureTabProps> = ({textureGroupLines, textureLines}
     const filteredRows = useMemo(() => {
         return sortedRows.filter((r) => {
         return (
-            (filters.name ? r.name.includes(filters.name) : true) &&
-            (filters.format ? r.format.includes(filters.format) : true) &&
-            (filters.lodGroup ? r.lodGroup.includes(filters.lodGroup) : true) &&
+            (filters.name ? r.name.toLowerCase().includes(filters.name.toLowerCase()) : true) &&
+            (filters.format ? r.format.toLowerCase().includes(filters.format.toLowerCase()) : true) &&
+            (filters.lodGroup ? r.lodGroup.toLowerCase().includes(filters.lodGroup.toLowerCase()) : true) &&
             (filters.streaming !== 'All' ? r.streaming ? filters.streaming === 'YES' : filters.streaming === 'NO': true) &&
             (filters.vt !== 'All' ? r.vt ? filters.vt === 'YES' : filters.vt === 'NO': true)
         );
@@ -455,7 +455,7 @@ const TextureTab: React.FC<TextureTabProps> = ({textureGroupLines, textureLines}
                         sortColumns={sortColumns}
                         onSortColumnsChange={setSortColumns}
                         headerRowHeight={70}
-                        className='texture-table'
+                        className='obj-table'
                         defaultColumnOptions={{
                             resizable: true,
                             sortable: true,
