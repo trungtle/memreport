@@ -205,15 +205,11 @@ const Memreport: React.FC = () => {
         <div className="memreport-table">
             <Tabs>
                 <TabList>
-                <Tab>Summary</Tab>
                 <Tab>Textures</Tab>
                 <Tab>Static Meshes</Tab>
                 <Tab>Skeletal Meshes</Tab>
+                <Tab>Summary</Tab>
                 </TabList>
-
-                <TabPanel>
-                    <FromMemreportTab fromMemreportLines={fromMemreportLinesArray} />
-                </TabPanel>
 
                 <TabPanel>
                     <TextureTab textureGroupLines={textureGroupLinesArray} textureLines={textureLinesArray} />
@@ -225,6 +221,10 @@ const Memreport: React.FC = () => {
 
                 <TabPanel>
                     <ObjListTab lines={skeletalMeshLinesArray} totalLine={skeletalMeshTotalLine} />
+                </TabPanel>
+
+                <TabPanel>
+                    <FromMemreportTab fromMemreportLines={fromMemreportLinesArray} />
                 </TabPanel>
 
             </Tabs>
